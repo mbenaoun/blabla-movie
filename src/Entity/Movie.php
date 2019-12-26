@@ -14,7 +14,7 @@ use DateTime;
  * @ORM\Entity(repositoryClass="App\Repository\MovieRepository")
  * @ORM\Table(name="movie")
  */
-class Movie
+class Movie extends EntityAbstract
 {
     #region Attributes
     /**

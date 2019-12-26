@@ -14,7 +14,7 @@ use DateTime;
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\Table(name="user", uniqueConstraints={@ORM\UniqueConstraint(name="uq_key_email",columns={"email"})})
  */
-class User
+class User extends EntityAbstract
 {
     #region Attributes
     /**
@@ -200,7 +200,7 @@ class User
     public function attachMovie(?Movie $movie): bool
     {
         $isAttached = false;
-        if($this->getMovies()->count() < 3 && $movie instanceof Movie) {
+        if ($this->getMovies()->count() < 3 && $movie instanceof Movie) {
             $this->addMovie($movie);
             $isAttached = true;
         }
