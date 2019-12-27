@@ -77,7 +77,23 @@ class ApiSerializer
         if ($format == 'json') {
             $data = json_decode($content, true);
         } else {
-            $data = simplexml_load_string($content);
+            $data = xmlrpc_decode($content);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param string $format
+     * @param $content
+     * @return false|string
+     */
+    public static function transformToString(string $format, $content)
+    {
+        if ($format == 'json') {
+            $data = json_encode($content);
+        } else {
+            $data = xmlrpc_encode($content);
         }
 
         return $data;

@@ -6,6 +6,10 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 
+/**
+ * Class ApiRequest
+ * @package App\Service
+ */
 class ApiRequest
 {
     /**

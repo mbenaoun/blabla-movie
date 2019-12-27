@@ -17,13 +17,18 @@ class ApiEntity
     /** @var EntityManager $entityManager */
     protected $entityManager;
 
+    /** @var ApiCache $apiCache */
+    protected $apiCache;
+
     /**
      * ApiEntity constructor.
      * @param EntityManager $entityManager
+     * @param ApiCache $apiCache
      */
-    public function __construct(EntityManager $entityManager)
+    public function __construct(EntityManager $entityManager, ApiCache $apiCache)
     {
         $this->entityManager = $entityManager;
+        $this->apiCache = $apiCache;
     }
 
     /**

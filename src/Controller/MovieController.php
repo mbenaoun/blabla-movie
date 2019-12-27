@@ -5,9 +5,7 @@ namespace App\Controller;
 use App\Entity\Movie;
 use App\Repository\MovieRepository;
 use App\Service\ApiEntity;
-use App\Service\ApiResponse;
 use App\Service\ApiSerializer;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,13 +15,12 @@ use Symfony\Component\Routing\Annotation\Route;
  * @package App\Controller
  * @Route("/v1/movies", name="movies_")
  */
-class MovieController extends AbstractController
+class MovieController extends ControllerAbstract
 {
     /**
      * @param Request $request
      * @param ApiEntity $apiEntity
      * @param ApiSerializer $apiSerializer
-     * @param ApiResponse $apiResponse
      * @return Response
      * @Route(
      *     "/users.{_format}",
@@ -38,8 +35,7 @@ class MovieController extends AbstractController
     public function users(
         Request $request,
         ApiEntity $apiEntity,
-        ApiSerializer $apiSerializer,
-        ApiResponse $apiResponse
+        ApiSerializer $apiSerializer
     ): Response {
         $format = $request->getRequestFormat();
         $mimeType = $request->getMimeType($format);
@@ -51,6 +47,6 @@ class MovieController extends AbstractController
 
         $jsonObject = $apiSerializer->objectSerialize($format, $movies, ['movies']);
 
-        return $apiResponse->response($jsonObject, Response::HTTP_OK, $mimeType);
+        return $this->apiResponse->response($jsonObject, Response::HTTP_OK, $mimeType);
     }
 }

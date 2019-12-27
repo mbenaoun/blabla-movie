@@ -53,17 +53,14 @@ class MovieRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    /**
-     * @return Movie|null
-     */
-    public function findBestMovie(): ?Movie
+    public function findBestMovie()
     {
         try {
             $movie = $this->createQueryBuilder('m')
                 ->join(self::USERS_KEYS, 'u')
-                ->addSelect('MAX(u) as HIDDEN maxUsers')
+                ->addSelect('COUNT(u) as HIDDEN maxMovies')
                 ->groupBy('m')
-                ->orderBy('maxUsers', 'DESC')
+                ->orderBy('maxMovies', 'DESC')
                 ->setMaxResults(1)
                 ->getQuery()
                 ->getOneOrNullResult();

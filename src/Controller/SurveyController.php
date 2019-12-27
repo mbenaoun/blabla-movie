@@ -9,12 +9,10 @@ use App\Exception\MovieException;
 use App\Repository\MovieRepository;
 use App\Service\ApiEntity;
 use App\Service\ApiMovie;
-use App\Service\ApiResponse;
 use App\Service\ApiSerializer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\ORMException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,13 +23,12 @@ use Exception;
  * @package App\Controller
  * @Route("/v1/survey", name="survey_")
  */
-class SurveyController extends AbstractController
+class SurveyController extends ControllerAbstract
 {
     /**
      * @param Request $request
      * @param ApiEntity $apiEntity
      * @param ApiMovie $apiMovie
-     * @param ApiResponse $apiResponse
      * @return Response
      * @throws ExceptionInterface
      * @Route(
@@ -47,8 +44,7 @@ class SurveyController extends AbstractController
     public function create(
         Request $request,
         ApiEntity $apiEntity,
-        ApiMovie $apiMovie,
-        ApiResponse $apiResponse
+        ApiMovie $apiMovie
     ): Response {
         $format = $request->getRequestFormat();
         $mimeType = $request->getMimeType($format);
@@ -62,7 +58,7 @@ class SurveyController extends AbstractController
             /** @var User $user */
             $user = $apiEntity->find(User::class, $data['userId']);
         } catch (EntityNotFoundException $entityNotFoundException) {
-            return $apiResponse->response(
+            return $this->apiResponse->response(
                 "Impossible to find the User (" . $user->getId() . ")!",
                 $statusResp,
                 $mimeType,
@@ -74,7 +70,7 @@ class SurveyController extends AbstractController
         try {
             $movie = $apiMovie->getOrCreateMovie($data);
         } catch (MovieException $e) {
-            return $apiResponse->response($e->getMessage(), $statusResp, $mimeType, $formatResp);
+            return $this->apiResponse->response($e->getMessage(), $statusResp, $mimeType, $formatResp);
         }
 
         $isAttached = $user->attachMovie($movie);
@@ -91,13 +87,12 @@ class SurveyController extends AbstractController
             $contentResp = "Impossible to attach an new movie to User (" . $user->getId() . ")! Technical error.";
         }
 
-        return $apiResponse->response($contentResp, $statusResp, $mimeType, $formatResp);
+        return $this->apiResponse->response($contentResp, $statusResp, $mimeType, $formatResp);
     }
 
     /**
      * @param Request $request
      * @param ApiEntity $apiEntity
-     * @param ApiResponse $apiResponse
      * @return Response
      * @Route(
      *     "/{user_id}/{movie_id?}.{_format}",
@@ -111,8 +106,7 @@ class SurveyController extends AbstractController
      */
     public function delete(
         Request $request,
-        ApiEntity $apiEntity,
-        ApiResponse $apiResponse
+        ApiEntity $apiEntity
     ): Response {
         $format = $request->getRequestFormat();
         $mimeType = $request->getMimeType($format);
@@ -124,7 +118,7 @@ class SurveyController extends AbstractController
             /** @var User $user */
             $user = $apiEntity->find(User::class, $userId);
         } catch (EntityNotFoundException $e) {
-            return $apiResponse->response(
+            return $this->apiResponse->response(
                 "Impossible to find the User (" . $userId . ")",
                 $statusResp,
                 $mimeType
@@ -140,7 +134,7 @@ class SurveyController extends AbstractController
                     $movie = $apiEntity->find(Movie::class, $movieId);
                     $user->removeMovie($movie);
                 } catch (EntityNotFoundException $e) {
-                    return $apiResponse->response(
+                    return $this->apiResponse->response(
                         "Impossible to find the Movie (" . $movieId . ")",
                         $statusResp,
                         $mimeType
@@ -159,7 +153,7 @@ class SurveyController extends AbstractController
             $contentResp = "No Movie(s) found for the User (" . $userId . ")";
         }
 
-        return $apiResponse->response(
+        return $this->apiResponse->response(
             $contentResp,
             $statusResp,
             $mimeType
@@ -170,7 +164,6 @@ class SurveyController extends AbstractController
      * @param Request $request
      * @param ApiSerializer $apiSerializer
      * @param ApiEntity $apiEntity
-     * @param ApiResponse $apiResponse
      * @return Response
      * @Route(
      *     "/best-movie.{_format}",
@@ -185,8 +178,7 @@ class SurveyController extends AbstractController
     public function getBestMovie(
         Request $request,
         ApiEntity $apiEntity,
-        ApiSerializer $apiSerializer,
-        ApiResponse $apiResponse
+        ApiSerializer $apiSerializer
     ): Response {
         $format = $request->getRequestFormat();
         $mimeType = $request->getMimeType($format);
@@ -198,9 +190,9 @@ class SurveyController extends AbstractController
         if ($movie instanceof Movie) {
             $jsonObject = $apiSerializer->objectSerialize($format, $movie, ['users']);
 
-            return $apiResponse->response($jsonObject, Response::HTTP_OK, $mimeType);
+            return $this->apiResponse->response($jsonObject, Response::HTTP_OK, $mimeType);
         } else {
-            return $apiResponse->response(
+            return $this->apiResponse->response(
                 "No Best Movie Found",
                 Response::HTTP_INTERNAL_SERVER_ERROR,
                 $mimeType

@@ -6,10 +6,9 @@ use App\Entity\Movie;
 use App\Entity\User;
 use App\Exception\EntityNotFoundException;
 use App\Repository\MovieRepository;
+use App\Service\ApiCache;
 use App\Service\ApiEntity;
-use App\Service\ApiResponse;
 use App\Service\ApiSerializer;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,13 +20,12 @@ use Exception;
  * @package App\Controller
  * @Route("/v1/users", name="users_")
  */
-class UserController extends AbstractController
+class UserController extends ControllerAbstract
 {
     /**
      * @param Request $request
      * @param ApiSerializer $apiSerializer
      * @param ApiEntity $apiEntity
-     * @param ApiResponse $apiResponse
      * @return Response
      * @throws ExceptionInterface
      * @Route(
@@ -43,8 +41,7 @@ class UserController extends AbstractController
     public function create(
         Request $request,
         ApiSerializer $apiSerializer,
-        ApiEntity $apiEntity,
-        ApiResponse $apiResponse
+        ApiEntity $apiEntity
     ): Response {
         $format = $request->getRequestFormat();
         $mimeType = $request->getMimeType($format);
@@ -57,22 +54,22 @@ class UserController extends AbstractController
             );
             $apiEntity->create($user);
             $jsonObject = $apiSerializer->objectSerialize($format, $user, ['movies']);
+            $this->apiCache->set(ApiCache::USERS_HASH_KEY, $user->getId(), $user);
         } catch (Exception $e) {
-            return $apiResponse->response(
+            return $this->apiResponse->response(
                 'Impossible to create User',
                 Response::HTTP_INTERNAL_SERVER_ERROR,
                 $mimeType
             );
         }
 
-        return $apiResponse->response($jsonObject, Response::HTTP_CREATED, $mimeType);
+        return $this->apiResponse->response($jsonObject, Response::HTTP_CREATED, $mimeType);
     }
 
     /**
      * @param Request $request
      * @param ApiSerializer $apiSerializer
      * @param ApiEntity $apiEntity
-     * @param ApiResponse $apiResponse
      * @return Response
      * @Route(
      *     "/{user_id}/movies.{_format}",
@@ -87,8 +84,7 @@ class UserController extends AbstractController
     public function movies(
         Request $request,
         ApiSerializer $apiSerializer,
-        ApiEntity $apiEntity,
-        ApiResponse $apiResponse
+        ApiEntity $apiEntity
     ): Response {
         $format = $request->getRequestFormat();
         $mimeType = $request->getMimeType($format);
@@ -97,7 +93,7 @@ class UserController extends AbstractController
             /** @var User $user */
             $user = $apiEntity->find(User::class, $request->get('user_id'));
         } catch (EntityNotFoundException $e) {
-            return $apiResponse->response(
+            return $this->apiResponse->response(
                 'No User Found',
                 Response::HTTP_INTERNAL_SERVER_ERROR,
                 $mimeType
@@ -110,6 +106,6 @@ class UserController extends AbstractController
 
         $jsonObject = $apiSerializer->objectSerialize($format, $movies, ['users']);
 
-        return $apiResponse->response($jsonObject, Response::HTTP_CREATED, $mimeType);
+        return $this->apiResponse->response($jsonObject, Response::HTTP_CREATED, $mimeType);
     }
 }

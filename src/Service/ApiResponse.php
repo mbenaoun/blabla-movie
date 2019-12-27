@@ -4,6 +4,10 @@ namespace App\Service;
 
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Class ApiResponse
+ * @package App\Service
+ */
 class ApiResponse
 {
     /**
@@ -16,7 +20,7 @@ class ApiResponse
     public function response($content, int $status, string $mimeType, string $format = ''): Response
     {
         if (!empty($format)) {
-            ApiSerializer::getDataFromFormat($format, $content);
+            $content = ApiSerializer::transformToString($format, $content);
         }
         return new Response(
             $content,

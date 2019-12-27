@@ -8,6 +8,10 @@ use App\Exception\MovieException;
 use Exception;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
+/**
+ * Class ApiMovie
+ * @package App\Service
+ */
 class ApiMovie
 {
     /** @var ApiEntity $apiEntity */
@@ -45,19 +49,19 @@ class ApiMovie
             $movie = $this->apiEntity->findOneBy(Movie::class, $param);
         } catch (EntityNotFoundException $entityNotFoundException) {
             $content = $this->apiRequest->request('GET', ['t' => $data['movieTitle']]);
-            if (is_array($content)) {
-                try {
-                    /** @var Movie $movie */
-                    $movie = $this->apiSerializer->dataDenormalize(
-                        ['title' => $content['Title'], 'poster' => $content['Poster']],
-                        Movie::class
-                    );
-                    $this->apiEntity->create($movie);
-                } catch (Exception $exception) {
-                    throw new MovieException('Impossible to create a new Movie !');
-                }
+            if (!is_array($content)) {
+                throw new MovieException('Impossible to find the Movie !');
             }
-            throw new MovieException('Impossible to find the Movie !');
+            try {
+                /** @var Movie $movie */
+                $movie = $this->apiSerializer->dataDenormalize(
+                    ['title' => $content['Title'], 'poster' => $content['Poster']],
+                    Movie::class
+                );
+                $this->apiEntity->create($movie);
+            } catch (Exception $exception) {
+                throw new MovieException('Impossible to create a new Movie !');
+            }
         }
         return $movie;
     }
