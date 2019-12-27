@@ -42,7 +42,7 @@ L'Agence Kreactive m'a demandé de réaliser une API permettant de :
    #Linux :
    vendor/bin/codecept run unit
    ## or ##
-   vendor/bin/codecept run unit codecept.phar run unit ApiMovieTest
+   vendor/bin/codecept run unit ApiMovieTest
     ```
 
 ## URI de l'API
