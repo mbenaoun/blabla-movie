@@ -19,10 +19,10 @@
         "symfony/property-access": "4.4.*",
         "symfony/property-info": "4.4.*",
         "symfony/serializer": "4.4.*",
-        "symfony/yaml": "4.4.*",
-        "ext-xmlrpc": "*"
+        "symfony/yaml": "4.4.*"
     },
     "require-dev": {
+        "codeception/codeception": "^4.0",
         "symfony/maker-bundle": "^1.14"
     },
     "config": {
