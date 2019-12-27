@@ -31,7 +31,16 @@ L'Agence Kreactive m'a demandé de réaliser une API permettant de :
     REDIS_PORT=__YOUR_REDIS_PORT__
     ###< settings redis ###
     ```
-6. BONUS : Un exemple de test unitaire réalisé.
+   
+6. Lancer les scripts de migration pour créer les tables
+   
+    ```shell script
+    php bin/console doctrine:migrations:migrate
+    ```
+   
+   Puis, presser sur la touche y du clavier pour exécuter les scripts de migration.
+   
+7. BONUS : Un exemple de test unitaire réalisé.
 
     ```shell script
    #Windows :
