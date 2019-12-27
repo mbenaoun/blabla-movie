@@ -23,6 +23,7 @@
     },
     "require-dev": {
         "codeception/codeception": "^4.0",
+        "codeception/module-asserts": "^1.1",
         "symfony/maker-bundle": "^1.14"
     },
     "config": {
