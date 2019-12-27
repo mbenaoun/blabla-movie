@@ -17,20 +17,33 @@ L'Agence Kreactive m'a demandé de réaliser une API permettant de :
 4. Avoir une db mysql avec une base de donnée
 5. Renseigner les config (DB et Redis) dans le fichier .env à la racine du projet
 
-```yaml
-###> doctrine/doctrine-bundle ###
-DB_HOST=__YOUR_DB_HOST__
-DB_PORT=__YOUR_DB_PORT__
-DB_SCHEMA=__YOUR_DB_SCHEMA__
-DB_USER=__YOUR_DB_USER__
-DB_PWD=__YOUR_DB_PWD__
-###< doctrine/doctrine-bundle ###
+    ```yaml
+    ###> doctrine/doctrine-bundle ###
+    DB_HOST=__YOUR_DB_HOST__
+    DB_PORT=__YOUR_DB_PORT__
+    DB_SCHEMA=__YOUR_DB_SCHEMA__
+    DB_USER=__YOUR_DB_USER__
+    DB_PWD=__YOUR_DB_PWD__
+    ###< doctrine/doctrine-bundle ###
+    
+    ###> settings redis ###
+    REDIS_HOST=__YOUR_REDIS_HOST__
+    REDIS_PORT=__YOUR_REDIS_PORT__
+    ###< settings redis ###
+    ```
+6. BONUS : Un exemple de test unitaire réalisé.
 
-###> settings redis ###
-REDIS_HOST=__YOUR_REDIS_HOST__
-REDIS_PORT=__YOUR_REDIS_PORT__
-###< settings redis ###
-```
+    ```shell script
+   #Windows :
+   php codecept.phar run unit
+   ## or ##
+   php codecept.phar run unit ApiMovieTest
+   
+   #Linux :
+   vendor/bin/codecept run unit
+   ## or ##
+   vendor/bin/codecept run unit codecept.phar run unit ApiMovieTest
+    ```
 
 ## URI de l'API
 
