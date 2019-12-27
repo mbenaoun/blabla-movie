@@ -68,6 +68,7 @@ class SurveyController extends ControllerAbstract
 
         $movie = null;
         try {
+            //Find movie in db. If movie not found, call Api omdbapi to create movie
             $movie = $apiMovie->getOrCreateMovie($data);
         } catch (MovieException $e) {
             return $this->apiResponse->response($e->getMessage(), $statusResp, $mimeType, $formatResp);

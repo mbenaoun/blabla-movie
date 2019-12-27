@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Exception\EntityNotFoundException;
 use App\Repository\MovieRepository;
 use App\Service\ApiCache;
+use App\Service\ApiChuckNorris;
 use App\Service\ApiEntity;
 use App\Service\ApiSerializer;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,6 +27,7 @@ class UserController extends ControllerAbstract
      * @param Request $request
      * @param ApiSerializer $apiSerializer
      * @param ApiEntity $apiEntity
+     * @param ApiChuckNorris $apiChuckNorris
      * @return Response
      * @throws ExceptionInterface
      * @Route(
@@ -41,19 +43,32 @@ class UserController extends ControllerAbstract
     public function create(
         Request $request,
         ApiSerializer $apiSerializer,
-        ApiEntity $apiEntity
+        ApiEntity $apiEntity,
+        ApiChuckNorris $apiChuckNorris
     ): Response {
         $format = $request->getRequestFormat();
         $mimeType = $request->getMimeType($format);
+        $content = $request->getContent();
+
+        //Check if easter egg activate ;)
+        $easterEgg = $apiChuckNorris->easterEgg($content, $format);
+
+        if (!is_null($easterEgg)) {
+            return $this->apiResponse->response($easterEgg, Response::HTTP_CREATED, $mimeType, $format);
+        }
 
         try {
+            // Transform Body request to an User Object
             $user = $apiSerializer->dataDenormalize(
                 $request->getContent(),
                 User::class,
                 $format
             );
+            // Create the user in db
             $apiEntity->create($user);
+            // Format User data in json to return it
             $jsonObject = $apiSerializer->objectSerialize($format, $user, ['movies']);
+            // Set User data in cache redis
             $this->apiCache->set(ApiCache::USERS_HASH_KEY, $user->getId(), $user);
         } catch (Exception $e) {
             return $this->apiResponse->response(
@@ -102,6 +117,7 @@ class UserController extends ControllerAbstract
 
         /** @var MovieRepository $movieRepository */
         $movieRepository = $apiEntity->getRepository(Movie::class);
+
         $movies = $movieRepository->findAllMovieByUser($user);
 
         $jsonObject = $apiSerializer->objectSerialize($format, $movies, ['users']);
